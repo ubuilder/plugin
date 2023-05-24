@@ -1,19 +1,18 @@
 {
     "name": "@ulibs/db",
-    "version": "0.0.1",
+    "version": "0.0.2-next.0",
     "description": "",
     "main": "index.js",
     "publishConfig": {
         "access": "public"
       },
     "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "exports": {
-      ".": "./index.js"
+        ".": "./index.js"
     }
-  }
-  
+}
