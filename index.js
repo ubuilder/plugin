@@ -1,9 +1,9 @@
-export function test() {
-    console.log('test')
-    return 'test'
-}
+const Model = require("./knex/models/Model");
+const createTable = require("./knex/migrations/createTable");
+const removeTable = require("./knex/migrations/removeTable");
 
-export function test2() {
-    console.log('test2')
-    return 'test2'
-}
+module.exports = {
+  Model,
+  createTable,
+  removeTable
+};
