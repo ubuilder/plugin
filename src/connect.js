@@ -1,5 +1,6 @@
-import { Model } from "./model";
-import { createTable, removeTable } from "./table";
+import { Model } from "./model.js";
+import { createTable, removeTable } from "./table.js";
+import knex from "knex";
 
 export function connect(config) {
     const db = knex(config)

@@ -1,7 +1,7 @@
 import express from "express";
 const PORT = process.env.PORT || 3001;
 const app = express();
-import { connect } from "../src/model.js";
+import { connect } from "../src/connect.js";
 
 const config = {
   client: "mysql",
@@ -24,15 +24,10 @@ const { Model, createTable, removeTable } = connect(config);
 
 const Users = Model("users");
 
-
 app.use(express.json());
 
 app.post("/make_table", async (req, res) => {
-  await createTable("users_3", [
-    { name: "name", type: "string", required: true },
-    { name: "email", type: "string" },
-    { name: "username", type: "string", unique: true },
-  ]);
+  // await createTable(,);
 
   res.send("success");
 });
@@ -44,7 +39,13 @@ app.post("/remove_table", async (req, res) => {
 
 
 app.get("/users", async (req, res) => {
-  res.json(await Users.query({}));
+  res.json(await Users.query({
+    where: {user_name: "sis"},
+    sort: {column: "user_name", order: "desc"},
+    select: ["id", "user_name"],
+    // page: 2,
+    perPage: 10
+  }));
 });
 
 app.get("/users/:id", async (req, res) => {

@@ -1,5 +1,3 @@
-import knex from "knex";
-
 export async function createTable(name, columns, db) {
     await db.schema.createTable(name, (table) => {
       let query;
