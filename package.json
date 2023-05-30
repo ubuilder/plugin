@@ -1,18 +1,22 @@
 {
-    "name": "@ulibs/db",
-    "version": "0.0.2-next.2",
-    "description": "",
-    "main": "index.js",
-    "publishConfig": {
-        "access": "public"
-    },
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-    "exports": {
-        ".": "./index.js"
-    }
+  "name": "@ulibs/db",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon test/server.js",
+    "start": "node test/server.js"
+  },
+  "type": "module",
+  "author": "edriss",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "knex": "^2.4.2",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.22"
+  },
+  "exports": {
+    ".": "./index.js"
+  }
 }
