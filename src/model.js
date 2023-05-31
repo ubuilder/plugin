@@ -10,7 +10,42 @@ export class Model {
     let query = this.db(this.tableName);
 
     if (where) {
-      query = query.where(where);
+      for (const key in where) {
+        if (typeof where[key] == "string" && where[key].includes(":")) {
+          const [filterValue, filterType ] = where[key].split(":");
+          if(filterType == "like") {
+            query = query.whereLike(key, `%${filterValue}%`);
+          }
+
+          if (filterValue == "null" && filterType == "=") {
+            query = query.whereNull(key);
+          }else if(filterType == "="){
+            query = query.where(key, filterValue);
+          }
+
+          if (filterValue == "null" && filterType == "!=") {
+            query = query.whereNotNull(key);
+          }else if(filterType == "!="){
+            query = query.whereNot(key, filterValue);
+          } 
+
+          if(filterType == "<" || filterType == ">" || filterType == "<=" || filterType == ">="){
+            query = query.where(key, filterType, filterValue)
+          }
+
+          if(filterType == "between"){
+            const [start, end] = filterValue.split(",");
+            query = query.whereBetween(key, [start, end]);
+          }
+
+          if(filterType == "in"){
+            const v = filterValue.split(",");
+            query = query.whereIn(key, v)
+          }
+        }else{
+          query = query.where(key, where[key])
+        }
+      }
     }
 
     if (select) {
