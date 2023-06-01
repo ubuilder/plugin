@@ -8,45 +8,6 @@ const { getModel, createTable, removeTable } = connect({
   client: "sqlite3",
 });
 
-await createTable("test", {
-  name: "string|required|default=No Name",
-  username: "string|required",
-  age: "number|required|default=0",
-  email: "string|required",
-});
-
-const Test = getModel("test");
-
-await Test.insert({
-  name: "hadi",
-  username: "thehadiahmadi",
-  age: 21,
-  email: "thehadiahmadi@gmail.com",
-});
-
-await Test.insert({
-  name: "edriass",
-  username: "edrissAria",
-  age: 23,
-  email: "edrisssaria@gmail.com",
-});
-await Test.insert({
-  name: "jawad",
-  username: "jawadAzizi",
-  age: 22,
-  email: "jawad.Azizi@gmail.com",
-});
-
-const filteredUsers = await Test.query({
-  where: {
-    name: "a:like",
-    age: "22:<=",
-    email: "gmail:like",
-  },
-});
-
-console.log(filteredUsers);
-
 const Users = getModel("users");
 
 app.use(express.json());
