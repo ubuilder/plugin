@@ -1,32 +1,39 @@
 export async function createTable(name, columns, db) {
-    await db.schema.createTable(name, (table) => {
-      let query;
-      table.increments("id");
-      for (const column of columns) {
-        if (column.type === "number") {
-          query = table.integer(column.name);
-        } else if (column.type === "string") {
-          query = table.text(column.name);
-        } else if (column.type == "boolean") {
-          query = table.boolean(column.name);
-        }
-  
-        if (column.required) {
+  await db.schema.createTable(name, (table) => {
+    let query;
+    table.increments("id");
+    for (let name in columns) {
+      const value = columns[name].split("|");
+
+      const type = value.shift();
+
+      if (type === "number") {
+        query = table.integer(name);
+      } else if (type === "string") {
+        query = table.text(name);
+      } else if (type == "boolean") {
+        query = table.boolean(name);
+      }
+
+      for (let part of value) {
+        if (part === "required") {
           query = query.notNullable();
-        }
-  
-        if (column.unique) {
+        } else if (part === "unique") {
           query = query.unique();
+        } else if (part.startsWith("default")) {
+          const value = part.split("=")[1];
+          query = query.defaultTo(value);
+        } else {
+          console.log("not implemented: ", part);
         }
       }
-    });
-  
+    }
     return true;
-  }
-  
+  });
+}
+
 export async function removeTable(name, db) {
-    await db.schema.dropTableIfExists(name);
-  
-    return true;
-  }
-  
+  await db.schema.dropTableIfExists(name);
+
+  return true;
+}

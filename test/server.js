@@ -3,32 +3,57 @@ const PORT = process.env.PORT || 3001;
 const app = express();
 import { connect } from "../src/connect.js";
 
-const config = {
-  client: "mysql",
-  connection: {
-    host: "127.0.0.1",
-    user: "root",
-    password: "",
-    database: "ubuilder",
-    charset: "utf8",
+const { getModel, createTable, removeTable } = connect({
+  filename: ":memory:",
+  client: "sqlite3",
+});
+
+await createTable("test", {
+  name: "string|required|default=No Name",
+  username: "string|required",
+  age: "number|required|default=0",
+  email: "string|required",
+});
+
+const Test = getModel("test");
+
+await Test.insert({
+  name: "hadi",
+  username: "thehadiahmadi",
+  age: 21,
+  email: "thehadiahmadi@gmail.com",
+});
+
+await Test.insert({
+  name: "edriass",
+  username: "edrissAria",
+  age: 23,
+  email: "edrisssaria@gmail.com",
+});
+await Test.insert({
+  name: "jawad",
+  username: "jawadAzizi",
+  age: 22,
+  email: "jawad.Azizi@gmail.com",
+});
+
+const filteredUsers = await Test.query({
+  where: {
+    name: "a:like",
+    age: "22:<=",
+    email: "gmail:like",
   },
-  // migrations: {
-  //   directory: __dirname + '/knex/migrations',
-  // },
-  // seeds: {
-  //   directory: __dirname + '/knex/seeds'
-  // }
-};
+});
 
-const { Model, createTable, removeTable } = connect(config);
+console.log(filteredUsers);
 
-const Users = Model("users");
+const Users = getModel("users");
 
 app.use(express.json());
 
 app.post("/make_table", async (req, res) => {
   // await createTable(,);
-
+  await createTable("users", [{ name: "user_name", type: "string" }]);
   res.send("success");
 });
 
@@ -37,20 +62,21 @@ app.post("/remove_table", async (req, res) => {
   res.send({ success: true });
 });
 
-
 app.get("/users", async (req, res) => {
-  res.json(await Users.query({
-    where: {
-      // active: true,
-      // user_name: "ss:like",
-      // user_name: "edriss:!=",
-      // user_name: null
-    },
-    // sort: {column: "user_name", order: "desc"},
-    // select: ["id", "user_name"],
-    page:2,
-    // perPage: 1
-  }));
+  res.json(
+    await Users.query({
+      where: {
+        // active: true,
+        user_name: "ss:like",
+        // user_name: "edriss:!=",
+        // user_name: null
+      },
+      // sort: {column: "user_name", order: "desc"},
+      // select: ["id", "user_name"],
+      page: 1,
+      // perPage: 1
+    })
+  );
 });
 
 app.get("/users/:id", async (req, res) => {
@@ -58,8 +84,8 @@ app.get("/users/:id", async (req, res) => {
 });
 
 app.post("/users", async (req, res) => {
-  console.log('CREATE USER')
-  console.log(req.body)
+  console.log("CREATE USER");
+  console.log(req.body);
   res.json(await Users.insert(req.body));
 });
 

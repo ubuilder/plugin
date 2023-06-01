@@ -11,44 +11,28 @@ export class Model {
 
     if (where) {
       for (const key in where) {
-        if (typeof where[key] == "string" && where[key].includes(":")) {
-          const [filterValue, filterType] = where[key].split(":");
-          if (filterType == "like") {
+        const value = where[key];
+
+        if (typeof value === "string" && value.includes(":")) {
+          const [filterValue, filterType] = value.split(":");
+
+          if (filterType === "like") {
             query = query.whereLike(key, `%${filterValue}%`);
-          }
-
-          if (filterValue == "null" && filterType == "=") {
+          } else if ((filterType === "=") & (filterValue === "null")) {
             query = query.whereNull(key);
-          } else if (filterType == "=") {
-            query = query.where(key, filterValue);
-          }
-
-          if (filterValue == "null" && filterType == "!=") {
+          } else if (filterType === "!=" && filterValue === "null") {
             query = query.whereNotNull(key);
-          } else if (filterType == "!=") {
-            query = query.whereNot(key, filterValue);
-          }
-
-          if (
-            filterType == "<" ||
-            filterType == ">" ||
-            filterType == "<=" ||
-            filterType == ">="
-          ) {
-            query = query.where(key, filterType, filterValue);
-          }
-
-          if (filterType == "between") {
-            const [start, end] = filterValue.split(",");
-            query = query.whereBetween(key, [start, end]);
-          }
-
-          if (filterType == "in") {
+          } else if (filterType === "in") {
             const v = filterValue.split(",");
             query = query.whereIn(key, v);
+          } else if (filterType === "between") {
+            const [start, end] = filterValue.split(",");
+            query = query.whereBetween(key, [start, end]);
+          } else {
+            query = query.where(key, filterType ?? "=", filterValue);
           }
         } else {
-          query = query.where(key, where[key]);
+          query = query.where(key, value);
         }
       }
     }
