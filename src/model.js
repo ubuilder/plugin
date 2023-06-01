@@ -10,7 +10,47 @@ export class Model {
     let query = this.db(this.tableName);
 
     if (where) {
-      query = query.where(where);
+      for (const key in where) {
+        if (typeof where[key] == "string" && where[key].includes(":")) {
+          const [filterValue, filterType] = where[key].split(":");
+          if (filterType == "like") {
+            query = query.whereLike(key, `%${filterValue}%`);
+          }
+
+          if (filterValue == "null" && filterType == "=") {
+            query = query.whereNull(key);
+          } else if (filterType == "=") {
+            query = query.where(key, filterValue);
+          }
+
+          if (filterValue == "null" && filterType == "!=") {
+            query = query.whereNotNull(key);
+          } else if (filterType == "!=") {
+            query = query.whereNot(key, filterValue);
+          }
+
+          if (
+            filterType == "<" ||
+            filterType == ">" ||
+            filterType == "<=" ||
+            filterType == ">="
+          ) {
+            query = query.where(key, filterType, filterValue);
+          }
+
+          if (filterType == "between") {
+            const [start, end] = filterValue.split(",");
+            query = query.whereBetween(key, [start, end]);
+          }
+
+          if (filterType == "in") {
+            const v = filterValue.split(",");
+            query = query.whereIn(key, v);
+          }
+        } else {
+          query = query.where(key, where[key]);
+        }
+      }
     }
 
     if (select) {
@@ -23,25 +63,29 @@ export class Model {
       query = query.orderBy(sort.column, sort.order);
     }
 
-    if (page || perPage) {
-      let currentPage = page ?? 1;
-      let itemsPerPage = perPage ?? 10;
+    let currentPage = page ?? 1;
+    let itemsPerPage = perPage ?? 10;
 
-      // Get the total number of rows in the database
-      const totalRows = await query.clone().count("* as count").first();
-      const totalCount = totalRows.count;
+    // Get the total number of rows in the database
+    const totalRows = await query.clone().count("* as count").first();
+    let total = totalRows.count;
 
-      // Adjust the perPage value if necessary
-      if (totalCount < itemsPerPage || !itemsPerPage) {
-        itemsPerPage = totalCount;
-      }
-
-      const offset = (currentPage - 1) * itemsPerPage;
-      query = query.offset(offset).limit(itemsPerPage);
+    // Adjust the perPage value if necessary
+    if (total < itemsPerPage || !itemsPerPage) {
+      itemsPerPage = total;
     }
 
-    const result = await query;
-    return result;
+    const offset = (currentPage - 1) * itemsPerPage;
+    query = query.offset(offset).limit(itemsPerPage);
+
+    const data = await query;
+
+    return {
+      data,
+      total,
+      page: currentPage,
+      perPage: itemsPerPage,
+    };
   }
 
   async insert(data) {

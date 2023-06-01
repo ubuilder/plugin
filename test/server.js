@@ -40,11 +40,16 @@ app.post("/remove_table", async (req, res) => {
 
 app.get("/users", async (req, res) => {
   res.json(await Users.query({
-    where: {user_name: "sis"},
-    sort: {column: "user_name", order: "desc"},
-    select: ["id", "user_name"],
-    // page: 2,
-    perPage: 10
+    where: {
+      // active: true,
+      // user_name: "ss:like",
+      // user_name: "edriss:!=",
+      // user_name: null
+    },
+    // sort: {column: "user_name", order: "desc"},
+    // select: ["id", "user_name"],
+    page:2,
+    // perPage: 1
   }));
 });
 
