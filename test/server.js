@@ -13,7 +13,6 @@ const Users = getModel("users");
 app.use(express.json());
 
 app.post("/make_table", async (req, res) => {
-  // await createTable(,);
   await createTable("users", [{ name: "user_name", type: "string" }]);
   res.send("success");
 });
