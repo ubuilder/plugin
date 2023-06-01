@@ -44,11 +44,11 @@ app.get("/users", async (req, res) => {
       // active: true,
       // user_name: "ss:like",
       // user_name: "edriss:!=",
-      user_name: null
+      // user_name: null
     },
     // sort: {column: "user_name", order: "desc"},
     // select: ["id", "user_name"],
-    // page: 1,
+    page:2,
     // perPage: 1
   }));
 });
