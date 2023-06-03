@@ -1,4 +1,4 @@
-export default class PluginManager {    
+export class PluginManager {    
     constructor(){
         //key : Name of class, value: class object
         this.plugins = {}

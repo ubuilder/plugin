@@ -1,4 +1,4 @@
-export default class Plugin{
+export class Plugin{
     name;
     description;
 
