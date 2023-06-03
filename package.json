@@ -3,6 +3,9 @@
   "version": "0.0.2-next.0",
   "description": "",
   "main": "index.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "nodemon test/server.js",
     "start": "node test/server.js"
