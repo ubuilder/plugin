@@ -1,28 +1,17 @@
-export class Plugin{
-    name;
-    description;
+export class BasePlugin {
+  onInit(ctx) {
+    console.log("plugin on Init", ctx);
+  }
 
-    //isActive and isInstalled should be saved in db
-    isActive=false;
-    isInstalled=false;
-    
-    constructor(){   
-        this.name = Object.getPrototypeOf(this).constructor.name
+  onBuild(ctx) {
+    console.log("plugin on build", ctx);
+  }
 
-        //retrive these states from db
-        this.isActive = true
-        this.isInstalled = true
-    }
-    onInit(){
-        if(!this.isActive) return new Error(`plugin ${this.name} is not active`)
-        //implement in child
-    }
-    onInstall(){
-        //change the status to installed
-        this.isActive = true
-    } 
-    onUninstall(){
-        //change the status to uninstalled
-        this.isInstalled = false
-    }
+  onActive() {
+    console.log("activated");
+  }
+
+  onDisable() {
+    console.log("onDisabled");
+  }
 }

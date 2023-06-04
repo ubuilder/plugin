@@ -1,17 +1,21 @@
-import Todo from '../src/plugins/Todo.js'
-import PluginManager  from '../src/classes/PluginManager.js'
-import Context from '../src/classes/Context.js'
+import {PluginManager} from "../src/classes/PluginManager.js";
+import {ExpressPlugin} from '../src/plugins/expressPlugin.js'
+import {PagesPlugin} from '../src/plugins/pagePlugin.js'
+import {PluginsPlugin} from '../src/plugins/pluginPlugin.js'
+import {SveltePlugin} from '../src/plugins/sveltePlugin.js'
+import {TodosPlugin} from '../src/plugins/Todo.js'
+import { getConfig } from "../src/config.js";
 
-let manager = new PluginManager()
+let allPlugins = {
+  express: ExpressPlugin,
+  plugins: PluginsPlugin,
+  svelte: SveltePlugin,
+  pages: PagesPlugin,
+  todos: TodosPlugin,
+};
 
-let todo = new Todo()
+console.log("test init step");
 
-manager.add(todo)
+const manager = new PluginManager(allPlugins);
 
-manager.install(todo)
-
-manager.start()
-
-console.log("ctx: ", Context.ctx )
-
-
+manager.init(getConfig());

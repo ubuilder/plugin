@@ -1,24 +1,65 @@
-export class PluginManager {    
-    constructor(){
-        //key : Name of class, value: class object
-        this.plugins = {}
+import { spawn } from "child_process";
+
+export class PluginManager {
+  allPlugins = {};
+  plugins = [];
+  onCleans = [];
+
+  constructor(allPlugins) {
+    this.allPlugins = allPlugins;
+  }
+
+  filterPlugins(allPlugins, config) {
+    Object.keys(config).map((key) => {
+      if (config[key]) {
+        this.plugins.push(new allPlugins[key]());
+      }
+    });
+  }
+
+  async init(config) {
+    this.filterPlugins(this.allPlugins, config);
+    let ctx = {
+      restart: (config) => {
+        this.restart(config);
+      },
+    };
+    for (let plugin of this.plugins) {
+      this.onCleans.push(await plugin.onInit(ctx));
     }
-    add(plugin){
-        this.plugins[plugin.name] = plugin
+
+    return ctx;
+  }
+
+  async build(config) {
+    this.filterPlugins(allPlugins, config);
+    let ctx = {};
+    for (let plugin of this.plugins) {
+      await plugin.onBuild(ctx ?? {});
     }
-    addAll(...arg){
-        arg.map((plugin)=> this.plugins[plugin.name] = plugin)
-    }
-    start(){
-        Object.values(this.plugins).map((plug)=>plug.onInit())
-    }
-    get(plugin){
-        return this.plugins[plugin.name]
-    }
-    uninstall(plugin){
-        this.plugins[plugin.name].onUninstall(this.ctx)
-    }
-    install(plugin){
-        this.plugins[plugin.name].onInstall(this.ctx)
-    }
+
+    return ctx;
+  }
+
+  async restart() {
+    console.log("restart");
+    process.on("exit", () => {
+      console.log("spawn");
+      const res = spawn("node test.js &");
+      console.log(res);
+      setTimeout(() => {}, 1000);
+    });
+    process.exit(1);
+  }
+
+  async active(plugin) {
+    this.plugins.push(plugin);
+    await plugin.onActive();
+  }
+
+  async disable(plugin) {
+    await plugin.onDisable();
+    this.plugins = this.plugins.filter((p) => p !== plugin);
+  }
 }
+
