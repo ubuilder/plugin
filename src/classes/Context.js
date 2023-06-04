@@ -1,3 +1,3 @@
-export default class Context{
+export class Context{
     static ctx
 }
