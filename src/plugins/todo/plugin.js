@@ -12,7 +12,7 @@ export class TodosPlugin extends BasePlugin {
     // ctx.router.addPage('/todos/inser', inserForm)
 
     //this works the same as above
-    ctx.router.addFileBasedRoutes('./pages', routePrifix='todos')
+    ctx.router.addFileBasedRoutes('./pages', routePrifix='/todos')
 
     //admin panel pages
     ctx.router.addPage('admin/todos/setting', settingPage)
