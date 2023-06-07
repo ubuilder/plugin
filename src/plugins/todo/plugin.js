@@ -37,23 +37,24 @@ export class TodosPlugin extends BasePlugin {
         ]
     }
 
+    //for adding the Todo to side bar of admin panel
+    ctx.addSideBarItem(sidebarItem)
 
+
+    //these function are called in the "actions" section of each page
     //for working with todo  in other plugins
     ctx.addTodo = (obj)=>{
         //
-    }
-    ctx.removeTodo = (todoId)=>{
-        //
+        //database work
     }
     ctx.editTodo = (todoId, obj)=>{
         //
+        //database work
     }
-    ctx.deleteTodo = (todoId)=>{
+    ctx.deleteTodo = ({todoId})=>{
         //
+        //database work
     }
-
-    //for adding the Todo to side bar of admin panel
-    ctx.addSideBarItem(sidebarItem)
 
     console.log("todosPlugin onInit");
   }

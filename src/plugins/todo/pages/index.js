@@ -37,6 +37,8 @@ export function layout(prop){
 let theme = "light";
 
 export default function (req, res) {
+
+  //this shoul return list of todos
   const table = TodoTable({ todos });
 
   const container = Card(

@@ -3,12 +3,16 @@ import {
   ModalBody,
 } from "./Input.js";
 
+export const actions = {
+  editTodo(req, res, ctx ,{todoId, tdoTitle, todoDescription}){
+    //editTodo() is define in plugins/todo/index.js
+    ctx.editTodo(todoId, {todoId, tdoTitle, todoDescription})
+    res.send("success")
+  }
+}
 
-export function post({params}){
-    const todo = todos.find((x) => x.id === +req.params.id);
-    if (!todo) res.redirect("/");
-  
-    console.log(todo);
+export default function({params}){
+  //this should return edit form
     const component = View({}, [
       Modal({ open: true, persistent: true, id: "add-todo-modal" }, [
         ModalBody({}, [
@@ -23,7 +27,7 @@ export function post({params}){
     ]);
   
     const html = render(component);
-  
+
     res.send(html);
 }
 
