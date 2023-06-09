@@ -2,8 +2,6 @@ import fs from "fs";
 
 export function PluginManager({ config } = {}) {
 
-  let ctx = {}
-
   function getConfig() {
     let result = {};
     if (config.endsWith(".json")) {
@@ -27,7 +25,7 @@ export function PluginManager({ config } = {}) {
   }
   async function updateConfig(updater) {
     const before = getConfig()
-    const after = updater(before)
+    const after = updater(JSON.parse(JSON.stringify(before)))
 
     if(JSON.stringify(before) !== JSON.stringify(after)) {
       setConfig(after);
@@ -54,6 +52,7 @@ export function PluginManager({ config } = {}) {
         if (methods.onInstall) {
           methods.onInstall(ctx);
         }
+
         return val;
       });
     }
