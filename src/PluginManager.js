@@ -1,7 +1,6 @@
 import fs from "fs";
 
 export function PluginManager({ config } = {}) {
-
   function getConfig() {
     let result = {};
     if (config.endsWith(".json")) {
@@ -24,42 +23,40 @@ export function PluginManager({ config } = {}) {
     return fs.writeFileSync(config, JSON.stringify(value));
   }
   async function updateConfig(updater) {
-    const before = getConfig()
-    const after = updater(JSON.parse(JSON.stringify(before)))
+    const before = getConfig();
+    const after = await updater(JSON.parse(JSON.stringify(before)));
 
-    if(JSON.stringify(before) !== JSON.stringify(after)) {
+    if (JSON.stringify(before) !== JSON.stringify(after)) {
       setConfig(after);
     }
-    
   }
 
   let plugins = [];
 
   async function install(name, methods, ctx) {
     // plugins[name] = methods;
-    if (config) {
-      updateConfig((val) => {
-        if (!val.plugins) val.plugins = [];
 
-        if (val.plugins.find((x) => x.name === name)) {
-          console.log(`plugin "${name}" is already installed!`);
-          plugins.push({ name, methods });
-          return val;
-        }
-        val.plugins.push({ name, order: 1, active: true });
+    await updateConfig(async (val) => {
+      if (!val.plugins) val.plugins = [];
+
+      if (val.plugins.find((x) => x.name === name)) {
+        console.log(`plugin "${name}" is already installed!`);
         plugins.push({ name, methods });
-
-        if (methods.onInstall) {
-          methods.onInstall(ctx);
-        }
-
         return val;
-      });
-    }
+      }
+      val.plugins.push({ name, order: 1, active: true });
+      plugins.push({ name, methods });
+
+      if (methods.onInstall) {
+        await methods.onInstall(ctx);
+      }
+
+      return val;
+    });
   }
 
   async function remove(name, ctx) {
-    updateConfig((cfg) => {
+    await updateConfig(async (cfg) => {
       if (!cfg.plugins.find((x) => x.name === name)) {
         console.log(`plugin "${name} is not installed!`);
         return cfg;
@@ -71,7 +68,7 @@ export function PluginManager({ config } = {}) {
       // run onRemove method
       const plugin = plugins.find((x) => x.name === name);
       if (plugin?.methods.onRemove) {
-        plugin.methods.onRemove(ctx);
+        await plugin.methods.onRemove(ctx);
       }
       // remove from local state
       plugins = plugins.filter((x) => x.name !== name);
