@@ -81,7 +81,7 @@ export function PluginManager({ config } = {}) {
     const config = getConfig();
 
     for (let plugin of plugins) {
-      if (config.plugins.find((x) => x.name === plugin.name)) {
+      if (config.plugins.find((x) => x.name === plugin.name && x.active)) {
         if (plugin.methods.onStart) {
           console.log("running plugin: " + plugin.name);
           await plugin.methods.onStart(ctx);
