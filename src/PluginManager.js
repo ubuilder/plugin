@@ -37,7 +37,7 @@ export function PluginManager({ config } = {}) {
 
   let plugins = [];
 
-  async function install(name, methods) {
+  async function install(name, methods, ctx) {
     // plugins[name] = methods;
     if (config) {
       updateConfig((val) => {
@@ -59,7 +59,7 @@ export function PluginManager({ config } = {}) {
     }
   }
 
-  async function remove(name) {
+  async function remove(name, ctx) {
     updateConfig((cfg) => {
       if (!cfg.plugins.find((x) => x.name === name)) {
         console.log(`plugin "${name} is not installed!`);
@@ -81,7 +81,7 @@ export function PluginManager({ config } = {}) {
     });
   }
 
-  async function start() {
+  async function start(ctx) {
     const config = getConfig();
 
     for (let plugin of plugins) {
