@@ -1,6 +1,6 @@
 import fs from "fs";
 
-export function PluginManager({ config } = {}) {
+export function PluginManager({ config, ctx = {} } = {}) {
   function getConfig() {
     let result = {};
     if (config.endsWith(".json")) {
@@ -33,7 +33,7 @@ export function PluginManager({ config } = {}) {
 
   let plugins = [];
 
-  async function install(name, methods, ctx) {
+  async function install(name, methods) {
     // plugins[name] = methods;
 
     await updateConfig(async (val) => {
@@ -55,7 +55,7 @@ export function PluginManager({ config } = {}) {
     });
   }
 
-  async function remove(name, ctx) {
+  async function remove(name) {
     await updateConfig(async (cfg) => {
       if (!cfg.plugins.find((x) => x.name === name)) {
         console.log(`plugin "${name} is not installed!`);
@@ -77,7 +77,7 @@ export function PluginManager({ config } = {}) {
     });
   }
 
-  async function start(ctx) {
+  async function start() {
     const config = getConfig();
 
     for (let plugin of plugins) {
