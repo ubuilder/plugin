@@ -1,6 +1,9 @@
 import fs from "fs";
 
 export function PluginManager({ config } = {}) {
+
+  let ctx = {}
+
   function getConfig() {
     let result = {};
     if (config.endsWith(".json")) {
@@ -34,7 +37,7 @@ export function PluginManager({ config } = {}) {
 
   let plugins = [];
 
-  async function install(name, methods, ctx = {}) {
+  async function install(name, methods) {
     // plugins[name] = methods;
     if (config) {
       updateConfig((val) => {
@@ -49,14 +52,14 @@ export function PluginManager({ config } = {}) {
         plugins.push({ name, methods });
 
         if (methods.onInstall) {
-          methods.onInstall({ ctx });
+          methods.onInstall(ctx);
         }
         return val;
       });
     }
   }
 
-  async function remove(name, ctx) {
+  async function remove(name) {
     updateConfig((cfg) => {
       if (!cfg.plugins.find((x) => x.name === name)) {
         console.log(`plugin "${name} is not installed!`);
@@ -69,7 +72,7 @@ export function PluginManager({ config } = {}) {
       // run onRemove method
       const plugin = plugins.find((x) => x.name === name);
       if (plugin?.methods.onRemove) {
-        plugin.methods.onRemove({ ctx });
+        plugin.methods.onRemove(ctx);
       }
       // remove from local state
       plugins = plugins.filter((x) => x.name !== name);
@@ -78,7 +81,7 @@ export function PluginManager({ config } = {}) {
     });
   }
 
-  async function start(ctx) {
+  async function start() {
     const config = getConfig();
 
     for (let plugin of plugins) {
