@@ -1,1 +1,1 @@
-// export * from './src/plugin.js'
+export * from './src/PluginManager.js'
