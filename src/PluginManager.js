@@ -37,20 +37,19 @@ export function PluginManager({ config, ctx = {} } = {}) {
     // plugins[name] = methods;
 
     await updateConfig(async (val) => {
-      if (!val.plugins) val.plugins = [];
-
       if (val.plugins.find((x) => x.name === name)) {
-        console.log(`plugin "${name}" is already installed!`);
-        plugins.push({ name, methods });
-        return val;
+        console.log(`Plugin "${name}" is already installed!`);
+      } else {
+        console.log(`Installing plugin "${name}..."`);
+
+        // Install and run onInstall of the plugin
+        val.plugins.push({ name, order: 1, active: true });
+        if (methods.onInstall) {
+          await methods.onInstall(ctx);
+        }
       }
-      val.plugins.push({ name, order: 1, active: true });
+
       plugins.push({ name, methods });
-
-      if (methods.onInstall) {
-        await methods.onInstall(ctx);
-      }
-
       return val;
     });
   }
@@ -59,17 +58,18 @@ export function PluginManager({ config, ctx = {} } = {}) {
     await updateConfig(async (cfg) => {
       if (!cfg.plugins.find((x) => x.name === name)) {
         console.log(`plugin "${name} is not installed!`);
-        return cfg;
+      } else {
+        // remove Plugin
+        console.log(`Removing plugin "${name}"...`);
+        cfg.plugins = cfg.plugins.filter((x) => x.name !== name);
+
+        // run onRemove method
+        const plugin = plugins.find((x) => x.name === name);
+        if (plugin?.methods.onRemove) {
+          await plugin.methods.onRemove(ctx);
+        }
       }
 
-      //   remove from config file
-      cfg.plugins = cfg.plugins.filter((x) => x.name !== name);
-
-      // run onRemove method
-      const plugin = plugins.find((x) => x.name === name);
-      if (plugin?.methods.onRemove) {
-        await plugin.methods.onRemove(ctx);
-      }
       // remove from local state
       plugins = plugins.filter((x) => x.name !== name);
 
@@ -83,7 +83,7 @@ export function PluginManager({ config, ctx = {} } = {}) {
     for (let plugin of plugins) {
       if (config.plugins.find((x) => x.name === plugin.name && x.active)) {
         if (plugin.methods.onStart) {
-          console.log("running plugin: " + plugin.name);
+          console.log(`Starting plugin "${plugin.name}"...`);
           await plugin.methods.onStart(ctx);
         }
       }
@@ -117,12 +117,13 @@ export function PluginManager({ config, ctx = {} } = {}) {
           if (plugin.name === name) {
             if (plugin.active) {
               plugin.active = false;
-              if (plugins[name].methods.onDisable) {
+
+              if (plugins[name] && plugins[name].methods.onDisable) {
                 plugins[name].methods.onDisable();
               }
             }
-            return plugin;
           }
+          return plugin;
         }),
       };
     });
