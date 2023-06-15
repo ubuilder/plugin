@@ -3,7 +3,7 @@ import fs from "fs";
 export function PluginManager({ config, ctx = {} } = {}) {
   function getConfig() {
     let result = {};
-    if (config.endsWith(".json")) {
+    if (config?.endsWith(".json")) {
       if (!fs.existsSync(config)) {
         fs.writeFileSync(config, "{}");
       }
@@ -35,6 +35,10 @@ export function PluginManager({ config, ctx = {} } = {}) {
 
   async function install(name, methods) {
     // plugins[name] = methods;
+    if (methods.updateCtx) {
+      console.log('install ' + name, methods)
+      methods.updateCtx(ctx);
+    }
 
     await updateConfig(async (val) => {
       if (val.plugins.find((x) => x.name === name)) {
