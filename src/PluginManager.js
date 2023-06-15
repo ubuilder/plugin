@@ -3,7 +3,7 @@ import fs from "fs";
 export function PluginManager({ config, ctx = {} } = {}) {
   function getConfig() {
     let result = {};
-    if (config.endsWith(".json")) {
+    if (config?.endsWith(".json")) {
       if (!fs.existsSync(config)) {
         fs.writeFileSync(config, "{}");
       }
@@ -35,6 +35,10 @@ export function PluginManager({ config, ctx = {} } = {}) {
 
   async function install(name, methods) {
     // plugins[name] = methods;
+    if (methods.updateCtx) {
+      console.log("install " + name, methods);
+      methods.updateCtx(ctx);
+    }
 
     await updateConfig(async (val) => {
       if (val.plugins.find((x) => x.name === name)) {
@@ -98,13 +102,14 @@ export function PluginManager({ config, ctx = {} } = {}) {
           if (plugin.name === name) {
             if (!plugin.active) {
               plugin.active = true;
-              if (plugins[name].methods.onEnable) {
-                plugins[name].methods.onEnable();
+              const targetPlugin = plugins.find((plug) => plug.name === name);
+              if (targetPlugin.methods.onEnable) {
+                targetPlugin.methods.onEnable();
               }
             }
-
-            return plugin;
           }
+
+          return plugin;
         }),
       };
     });

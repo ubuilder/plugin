@@ -145,6 +145,47 @@ test("enable/disable plugins should work", async (t) => {
   await pm.remove("test-51");
 });
 
+test("updateCtx should add new Item to ctx (available to onInstall, onRemove..)", async (t) => {
+  if (fs.existsSync("./test-8.json")) {
+    fs.rmSync("./test-8.json");
+  }
+
+  const pm = PluginManager({
+    config: "./test-8.json",
+    ctx: {
+      initial: true,
+    },
+  });
+
+  await pm.install("prepare", {
+    updateCtx(ctx) {
+      t.deepEqual(ctx.initial, true);
+
+      ctx.another = "123";
+    },
+  });
+  await pm.install("test", {
+    onInstall(ctx) {
+      t.deepEqual(ctx.initial, true);
+      t.deepEqual(ctx.another, "123");
+      t.falsy(ctx.test);
+    },
+    onRemove(ctx) {
+      t.deepEqual(ctx.initial, true);
+      t.deepEqual(ctx.another, "123");
+      t.falsy(ctx.test);
+    },
+    onStart(ctx) {
+      console.log(ctx);
+      t.deepEqual(ctx.initial, true);
+      t.deepEqual(ctx.another, "123");
+      t.falsy(ctx.test);
+    },
+  });
+
+  pm.start();
+});
+
 test("should work everything", async (t) => {
   if (fs.existsSync("./test-7.json")) {
     fs.rmSync("./test-7.json");
