@@ -36,7 +36,7 @@ export function PluginManager({ config, ctx = {} } = {}) {
   async function install(name, methods) {
     // plugins[name] = methods;
     if (methods.updateCtx) {
-      console.log('install ' + name, methods)
+      console.log("install " + name, methods);
       methods.updateCtx(ctx);
     }
 
@@ -102,13 +102,14 @@ export function PluginManager({ config, ctx = {} } = {}) {
           if (plugin.name === name) {
             if (!plugin.active) {
               plugin.active = true;
-              if (plugins[name].methods.onEnable) {
-                plugins[name].methods.onEnable();
+              const targetPlugin = plugins.find((plug) => plug.name === name);
+              if (targetPlugin.methods.onEnable) {
+                targetPlugin.methods.onEnable();
               }
             }
-
-            return plugin;
           }
+
+          return plugin;
         }),
       };
     });
