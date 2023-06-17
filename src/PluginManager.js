@@ -159,8 +159,12 @@ export function PluginManager({ config, ctx = {} } = {}) {
     )
     
   }
+  function getCotext(){
+    return ctx
+  }
 
   return {
+    getCotext,
     loadPlugins,
     install,
     remove,
