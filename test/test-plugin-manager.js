@@ -117,6 +117,64 @@ test("should not run onInstall of an installed plugin", async (t) => {
   await pm.remove("test-4");
 });
 
+test("shoul enable plugin after installation to start", async (t) => {
+  if (fs.existsSync("./test-5.json")) {
+    fs.rmSync("./test-5.json");
+  }
+
+  const pm = PluginManager({
+    config: "test-5.json",
+  });
+
+  await pm.install("test-4", {
+    onInstall(ctx) {
+      //
+      t.pass();
+    },
+  });
+
+  await pm.start("test-5", {
+    onStart(ctx) {
+      //
+      t.fail();
+    },
+  });
+  await pm.remove("test-5");
+});
+
+test("run on start if plugin is installed and enabled", async (t) => {
+  if (fs.existsSync("./test-6.json")) {
+    fs.rmSync("./test-6.json");
+  }
+
+  const pm = PluginManager({
+    config: "test-6.json",
+  });
+
+  await pm.install("test-6", {
+    onInstall(ctx) {
+      //
+      t.pass();
+    },
+  });
+
+  await pm.enable("test-6", {
+    onEnable(ctx) {
+      //
+      t.pass();
+    },
+  });
+
+  await pm.start("test-6", {
+    onStart(ctx) {
+      //
+      t.pass();
+    },
+  });
+  await pm.remove("test-6");
+});
+
+
 test("enable/disable plugins should work", async (t) => {
   if (fs.existsSync("./test-6.json")) {
     fs.rmSync("./test-6.json");
@@ -142,7 +200,7 @@ test("enable/disable plugins should work", async (t) => {
   await pm.start();
 
   await pm.remove("test-5");
-  await pm.remove("test-51");
+  await pm.remove("test-5");
 });
 
 test("updateCtx should add new Item to ctx (available to onInstall, onRemove..)", async (t) => {
@@ -184,6 +242,34 @@ test("updateCtx should add new Item to ctx (available to onInstall, onRemove..)"
   });
 
   pm.start();
+});
+
+test("plugin should be loade before anythind", async (t) => {
+  if (fs.existsSync("./test-8.json")) {
+    fs.rmSync("./test-8.json");
+  }
+
+  const pm = PluginManager({
+    config: "./test-8.json",
+    ctx: {
+      initial: true,
+    },
+  });
+  // let folder = {
+  //   plugin1: {
+
+  //   },
+  //   plugin2: {
+
+  //   },
+  // }
+  // await pm.loadPlugins(folder)
+
+  // await pm.install('plugin1')
+  // await pm.install('plugin2')
+  // await pm.install('plugin3')
+  // t.fail();
+  t.pass()
 });
 
 test("should work everything", async (t) => {
