@@ -186,7 +186,7 @@ test("updateCtx should add new Item to ctx (available to onInstall, onRemove..)"
   pm.start();
 });
 
-test("start should return all items in ctx", async (t) => {
+test("getContext should return ctx", async (t) => {
   if (fs.existsSync("./test-9.json")) {
     fs.rmSync("./test-9.json");
   }
@@ -224,7 +224,8 @@ test("start should return all items in ctx", async (t) => {
     },
   });
 
-  const ctx = await pm.start();
+  await pm.start();
+  const ctx = pm.getCotext();
   t.deepEqual(ctx, { initial: true, another: "123" });
 });
 
