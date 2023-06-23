@@ -186,6 +186,48 @@ test("updateCtx should add new Item to ctx (available to onInstall, onRemove..)"
   pm.start();
 });
 
+test("start should return all items in ctx", async (t) => {
+  if (fs.existsSync("./test-9.json")) {
+    fs.rmSync("./test-9.json");
+  }
+
+  const pm = PluginManager({
+    config: "./test-9.json",
+    ctx: {
+      initial: true,
+    },
+  });
+
+  await pm.install("prepare", {
+    updateCtx(ctx) {
+      t.deepEqual(ctx.initial, true);
+
+      ctx.another = "123";
+    },
+  });
+  await pm.install("test", {
+    onInstall(ctx) {
+      t.deepEqual(ctx.initial, true);
+      t.deepEqual(ctx.another, "123");
+      t.falsy(ctx.test);
+    },
+    onRemove(ctx) {
+      t.deepEqual(ctx.initial, true);
+      t.deepEqual(ctx.another, "123");
+      t.falsy(ctx.test);
+    },
+    onStart(ctx) {
+      console.log(ctx);
+      t.deepEqual(ctx.initial, true);
+      t.deepEqual(ctx.another, "123");
+      t.falsy(ctx.test);
+    },
+  });
+
+  const ctx = await pm.start();
+  t.deepEqual(ctx, { initial: true, another: "123" });
+});
+
 test("should work everything", async (t) => {
   if (fs.existsSync("./test-7.json")) {
     fs.rmSync("./test-7.json");

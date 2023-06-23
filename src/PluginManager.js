@@ -92,6 +92,7 @@ export function PluginManager({ config, ctx = {} } = {}) {
         }
       }
     }
+    return ctx;
   }
 
   async function enable(name) {
