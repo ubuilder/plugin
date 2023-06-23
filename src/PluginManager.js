@@ -1,6 +1,7 @@
 import fs from "fs";
 
 export function PluginManager({ config, ctx = {} } = {}) {
+  let localConfig = { plugins: []};
   function getConfig() {
     let result = {};
     if (config?.endsWith(".json")) {
@@ -10,14 +11,16 @@ export function PluginManager({ config, ctx = {} } = {}) {
       result = JSON.parse(fs.readFileSync(config, "utf-8") ?? "{}");
     } else {
       console.log("config file should be json file.");
+      return localConfig;
     }
 
     if (!result.plugins) result.plugins = [];
     return result;
   }
   async function setConfig(value = {}) {
-    if (!config.endsWith(".json")) {
+    if (!config?.endsWith(".json")) {
       console.log("config file should be json file. Will not save state");
+      localConfig = value;
       return;
     }
     return fs.writeFileSync(config, JSON.stringify(value));

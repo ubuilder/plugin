@@ -295,3 +295,66 @@ test("should work everything", async (t) => {
   await pm.remove("plugin-1");
   await pm.remove("plugin-2");
 });
+
+test('Should work if there is no config file', async t => {
+
+  const pm = PluginManager({
+    ctx: { abc: 123 },
+  });
+
+  await pm.install("plugin-1", {
+    onInstall(ctx) {
+      t.deepEqual(ctx, { abc: 123 });
+      //
+    },
+    onRemove(ctx) {
+      t.deepEqual(ctx, { abc: 123, def: 456 });
+      t.pass();
+      delete ctx["def"];
+      //
+    },
+    onStart(ctx) {
+      t.deepEqual(ctx, { abc: 123 });
+      ctx.def = 456;
+    },
+    onEnable(ctx) {
+      t.deepEqual(ctx, { abc: 123 });
+    },
+    onDisable(ctx) {
+      t.deepEqual(ctx, { abc: 123 });
+    },
+  });
+
+  await pm.install("plugin-2", {
+    onInstall(ctx) {
+      t.deepEqual(ctx, { abc: 123 });
+      //
+    },
+    onRemove(ctx) {
+      t.deepEqual(ctx, { abc: 123 });
+      t.pass();
+      //
+    },
+    onStart(ctx) {
+      t.deepEqual(ctx, { abc: 123, def: 456 });
+    },
+    onEnable(ctx) {
+      t.deepEqual(ctx, { abc: 123 });
+    },
+    onDisable(ctx) {
+      t.deepEqual(ctx, { abc: 123 });
+    },
+  });
+
+  // should not run onInstall of installed plugin
+  await pm.install("plugin-1", {
+    onInstall() {
+      t.fail();
+    },
+  });
+
+  await pm.start();
+
+  await pm.remove("plugin-1");
+  await pm.remove("plugin-2");
+})
