@@ -135,7 +135,38 @@ export function PluginManager({ config, ctx = {} } = {}) {
     });
   }
 
+  async function loadPlugins(pluginFolder = getConfig().pluginDir){
+    if(!pluginFolder){
+      return console.log('no plugins directory is specified in config file')
+    }
+    let files = fs.readdirSync(pluginFolder, {encoding: "utf-8", withFileTypes: true})
+    await Promise.all(
+      files.map( async (dirent) =>{
+        if(dirent.isDirectory()){
+          let rootpath =  pathToFileURL(pluginFolder+"/"+dirent.name+'/index.js')
+          if(fs.existsSync(rootpath)){
+            const newPlugin = {
+              name: dirent.name, 
+              methods: { ...(await import(rootpath))}
+            }
+            plugins = [...plugins, newPlugin]
+            console.log('plugin added')
+          }else{
+            return console.log(`${dirent.name} plugin should have a index.js root file`)
+          }
+        }
+        
+      })
+    )
+    
+  }
+  function getCotext(){
+    return ctx
+  }
+
   return {
+    getCotext,
+    loadPlugins,
     install,
     remove,
     start,
