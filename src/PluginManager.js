@@ -167,12 +167,12 @@ export function PluginManager({ config, ctx = {} } = {}) {
       })
     );
   }
-  function getCotext() {
+  function getContext() {
     return ctx;
   }
 
   return {
-    getCotext,
+    getContext,
     loadPlugins,
     install,
     remove,
